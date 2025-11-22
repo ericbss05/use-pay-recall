@@ -1,0 +1,771 @@
+<html lang="fr"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RetryPay — Dashboard</title>
+    <link rel="preconnect" href="https://rsms.me">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+  <body class="min-h-screen bg-neutral-950 text-neutral-100 antialiased selection:bg-indigo-500/30 selection:text-white" style="font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;">
+    <!-- App Shell -->
+    <header class="border-b border-white/5 backdrop-blur bg-neutral-950/70 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 px-5 py-4">
+        <!-- Brand -->
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 rounded-md bg-linear-to-br from-indigo-500 to-violet-500 grid place-items-center">
+            <span class="text-sm font-semibold tracking-tight">RP</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-lg font-semibold tracking-tight">RetryPay</span>
+            <span class="text-xs text-neutral-400">Récupération automatique des paiements échoués</span>
+          </div>
+        </div>
+
+        <!-- Nav -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button data-tab="dashboard" class="tab-btn inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-200 hover:bg-white/5 aria-selected:bg-white/10 aria-selected:text-white" aria-selected="true">
+            <!-- lucide: bar-chart-3 -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 3v18h18"></path><path d="M13 13h4v5h-4z"></path><path d="M6 16h4v2H6z"></path><path d="M18 8h3v10h-3z"></path>
+            </svg>
+            Dashboard
+          </button>
+          <button data-tab="retry" class="tab-btn inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-300 hover:bg-white/5">
+            <!-- lucide: refresh-ccw -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path><polyline points="23 20 23 14 17 14"></polyline>
+            </svg>
+            Règles de retry
+          </button>
+          <button data-tab="emails" class="tab-btn inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-300 hover:bg-white/5">
+            <!-- lucide: mail -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 4h16v16H4z"></path><path d="m22 6-10 7L2 6"></path>
+            </svg>
+            Modèles d’emails
+          </button>
+          <button data-tab="notifications" class="tab-btn inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-300 hover:bg-white/5">
+            <!-- lucide: bell -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10 22a2 2 0 0 0 4 0"></path>
+            </svg>
+            Notifications
+          </button>
+          <button data-tab="dev" class="tab-btn inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-neutral-300 hover:bg-white/5">
+            <!-- lucide: code-2 -->
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path>
+            </svg>
+            Développeurs
+          </button>
+        </nav>
+
+        <!-- Right actions -->
+        <div class="flex items-center gap-3">
+          <span class="hidden sm:flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-200">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-500/40 animate-ping"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            </span>
+            Stripe connecté
+          </span>
+          <button class="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">
+            <!-- lucide: user -->
+            <svg class="h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M20 21a8 8 0 1 0-16 0"></path><circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Compte
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-5 py-6 md:py-8">
+      <!-- Connect Stripe CTA (visible if disconnected) -->
+      <section id="connect" class="hidden rounded-lg border border-white/10 bg-linear-to-b from-neutral-900/60 to-neutral-900 p-4 md:p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-start gap-3">
+            <!-- lucide: plug -->
+            <svg class="h-5 w-5 text-indigo-400 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 7V3"></path><path d="M15 7V3"></path><path d="M12 15v6"></path><path d="M7 11h10"></path><path d="M7 15h10"></path><path d="M8 11V9a4 4 0 1 1 8 0v2"></path>
+            </svg>
+            <div>
+              <h2 class="text-lg font-semibold tracking-tight">Connecter votre compte Stripe</h2>
+              <p class="text-sm text-neutral-400 mt-1">Autorisez l’accès aux paiements et abonnements. Les webhooks se configurent automatiquement.</p>
+            </div>
+          </div>
+          <button class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-500/90 px-3 py-2 text-sm font-medium">
+            <!-- lucide: link -->
+            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Connecter via OAuth
+          </button>
+        </div>
+      </section>
+
+      <!-- Dashboard -->
+      <section data-panel="dashboard" class="panel mt-6 space-y-6">
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-neutral-400">Paiements échoués</span>
+              <!-- lucide: alert-triangle -->
+              <svg class="h-4 w-4 text-amber-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="mt-3 text-3xl font-semibold tracking-tight">32</div>
+            <div class="mt-1 text-xs text-neutral-400">30 derniers jours</div>
+          </div>
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-neutral-400">Paiements récupérés</span>
+              <!-- lucide: check-circle -->
+              <svg class="h-4 w-4 text-emerald-400/90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="mt-3 text-3xl font-semibold tracking-tight">21</div>
+            <div class="mt-1 text-xs text-neutral-400">Taux de succès 65%</div>
+          </div>
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-neutral-400">MRR récupéré</span>
+              <!-- lucide: currency -->
+              <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="mt-3 text-3xl font-semibold tracking-tight">€1 540</div>
+            <div class="mt-1 text-xs text-neutral-400">+€420 vs. le mois dernier</div>
+          </div>
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-neutral-400">Relances envoyées</span>
+              <!-- lucide: mail-check -->
+              <svg class="h-4 w-4 text-sky-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 12.1V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10"></path><path d="m22 6-10 7L2 6"></path><path d="m16 19 2 2 4-4"></path>
+              </svg>
+            </div>
+            <div class="mt-3 text-3xl font-semibold tracking-tight">78</div>
+            <div class="mt-1 text-xs text-neutral-400">Automatisées</div>
+          </div>
+        </div>
+
+        <!-- Chart + Activity -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="lg:col-span-2 rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-base font-semibold tracking-tight">MRR récupéré</h3>
+                <p class="text-xs text-neutral-400 mt-0.5">Sur 30 jours</p>
+              </div>
+              <div class="inline-flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-1.5">
+                <!-- Period pills -->
+                <button class="text-xs text-neutral-200 rounded bg-white/10 px-2 py-1">30j</button>
+                <button class="text-xs text-neutral-400 hover:text-neutral-200 px-2 py-1">90j</button>
+                <button class="text-xs text-neutral-400 hover:text-neutral-200 px-2 py-1">1 an</button>
+              </div>
+            </div>
+            <div class="mt-4">
+              <!-- Simple area chart placeholder -->
+              <div class="h-40 w-full rounded-md bg-linear-to-b from-indigo-500/20 via-transparent to-transparent relative overflow-hidden">
+                <svg viewBox="0 0 100 40" preserveAspectRatio="none" class="absolute inset-0 h-full w-full">
+                  <defs>
+                    <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"></stop>
+                      <stop offset="100%" stop-color="transparent" stop-opacity="0"></stop>
+                    </linearGradient>
+                  </defs>
+                  <polyline fill="url(#g)" stroke="none" points="0,28 10,26 20,24 30,30 40,18 50,20 60,14 70,16 80,10 90,12 100,8 100,40 0,40"></polyline>
+                  <polyline fill="none" stroke="#818cf8" stroke-width="1.5" points="0,28 10,26 20,24 30,30 40,18 50,20 60,14 70,16 80,10 90,12 100,8"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold tracking-tight">Activité</h3>
+              <button class="text-xs text-neutral-300 hover:text-white">Voir tout</button>
+            </div>
+            <ol class="mt-3 space-y-3">
+              <li class="flex items-start gap-3">
+                <!-- lucide: send -->
+                <svg class="h-4 w-4 text-sky-300 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="m22 2-7 20-4-9-9-4 20-7z"></path><path d="M22 2 11 13"></path>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm">Email de relance envoyé à Marie D.</p>
+                  <p class="text-xs text-neutral-400">il y a 12 min • tentative 2/3</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <!-- lucide: check -->
+                <svg class="h-4 w-4 text-emerald-400 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm">Paiement récupéré : Formation Copywriting</p>
+                  <p class="text-xs text-neutral-400">€59 • Stripe Portal</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <!-- lucide: alert-octagon -->
+                <svg class="h-4 w-4 text-amber-400 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M7.86 2h8.28L22 7.86v8.28L16.14 22H7.86L2 16.14V7.86z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm">Échec de paiement : Abonnement Masterclass</p>
+                  <p class="text-xs text-neutral-400">Carte expirée • nouveau retry dans 24h</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Failed and Recovered tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Failed -->
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold tracking-tight">Paiements échoués</h3>
+              <div class="flex items-center gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-md bg-white/5 hover:bg-white/10 px-2.5 py-1.5 text-xs">
+                  <!-- lucide: rotate-ccw -->
+                  <svg class="h-3.5 w-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                  </svg>
+                  Sync Stripe
+                </button>
+              </div>
+            </div>
+            <div class="mt-3 overflow-hidden rounded-md border border-white/5">
+              <table class="min-w-full text-sm">
+                <thead class="bg-white/5 text-neutral-300">
+                  <tr>
+                    <th class="text-left font-medium px-3 py-2">Client</th>
+                    <th class="text-left font-medium px-3 py-2">Formation</th>
+                    <th class="text-left font-medium px-3 py-2">Montant</th>
+                    <th class="text-left font-medium px-3 py-2">Statut</th>
+                    <th class="text-left font-medium px-3 py-2">Prochain retry</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Marie Dubois</td>
+                    <td class="px-3 py-2">Copywriting Pro</td>
+                    <td class="px-3 py-2">€59</td>
+                    <td class="px-3 py-2">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-300 px-2 py-0.5 text-xs">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span> en retry 2/3
+                      </span>
+                    </td>
+                    <td class="px-3 py-2">demain 10:00</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Hugo Martin</td>
+                    <td class="px-3 py-2">SEO Starter</td>
+                    <td class="px-3 py-2">€39</td>
+                    <td class="px-3 py-2">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 text-rose-300 px-2 py-0.5 text-xs">
+                        <span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span> échoué
+                      </span>
+                    </td>
+                    <td class="px-3 py-2">dans 24h</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Sofia Lemaire</td>
+                    <td class="px-3 py-2">FB Ads Lab</td>
+                    <td class="px-3 py-2">€79</td>
+                    <td class="px-3 py-2">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-300 px-2 py-0.5 text-xs">
+                        <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span> en retry 1/3
+                      </span>
+                    </td>
+                    <td class="px-3 py-2">aujourd’hui 18:00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recovered -->
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold tracking-tight">Paiements récupérés</h3>
+              <div class="text-xs text-neutral-400">7 derniers jours</div>
+            </div>
+            <div class="mt-3 overflow-hidden rounded-md border border-white/5">
+              <table class="min-w-full text-sm">
+                <thead class="bg-white/5 text-neutral-300">
+                  <tr>
+                    <th class="text-left font-medium px-3 py-2">Client</th>
+                    <th class="text-left font-medium px-3 py-2">Formation</th>
+                    <th class="text-left font-medium px-3 py-2">Montant</th>
+                    <th class="text-left font-medium px-3 py-2">Canal</th>
+                    <th class="text-left font-medium px-3 py-2">Quand</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Lucas Bernard</td>
+                    <td class="px-3 py-2">NoCode Bootcamp</td>
+                    <td class="px-3 py-2">€99</td>
+                    <td class="px-3 py-2">Portal</td>
+                    <td class="px-3 py-2">il y a 2h</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Emma Petit</td>
+                    <td class="px-3 py-2">Email Mastery</td>
+                    <td class="px-3 py-2">€49</td>
+                    <td class="px-3 py-2">Retry auto</td>
+                    <td class="px-3 py-2">hier</td>
+                  </tr>
+                  <tr class="hover:bg-white/5">
+                    <td class="px-3 py-2">Nina Caron</td>
+                    <td class="px-3 py-2">Design Sprint</td>
+                    <td class="px-3 py-2">€129</td>
+                    <td class="px-3 py-2">Portal</td>
+                    <td class="px-3 py-2">il y a 3j</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Retry Rules -->
+      <section data-panel="retry" class="panel hidden mt-6 space-y-6">
+        <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4 md:p-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-semibold tracking-tight">Configuration des relances</h3>
+              <p class="text-xs text-neutral-400 mt-0.5">Définissez le nombre d’essais et les intervalles de retry. Canal disponible : email.</p>
+            </div>
+            <span class="inline-flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-1.5 text-xs">
+              <!-- lucide: shield -->
+              <svg class="h-3.5 w-3.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              RGPD &amp; sécurisé
+            </span>
+          </div>
+
+          <div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Attempts -->
+            <div class="rounded-md border border-white/10 bg-neutral-950/40 p-4">
+              <label class="text-sm text-neutral-300">Nombre d’essais</label>
+              <div class="mt-3 inline-flex items-center gap-2 rounded-md border border-white/10 bg-neutral-900/60 p-1">
+                <button id="attempt-dec" class="h-8 w-8 grid place-items-center rounded-md bg-white/5 hover:bg-white/10">
+                  <!-- lucide: minus -->
+                  <svg class="h-4 w-4 text-neutral-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+                <input id="attempts" type="number" min="1" max="6" value="3" class="w-16 bg-transparent text-center text-base font-semibold focus:outline-none">
+                <button id="attempt-inc" class="h-8 w-8 grid place-items-center rounded-md bg-white/5 hover:bg-white/10">
+                  <!-- lucide: plus -->
+                  <svg class="h-4 w-4 text-neutral-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+              <p class="mt-2 text-xs text-neutral-400">Max 6 essais recommandés.</p>
+            </div>
+
+            <!-- Interval buttons -->
+            <div class="rounded-md border border-white/10 bg-neutral-950/40 p-4">
+              <label class="text-sm text-neutral-300">Intervalle entre essais</label>
+              <div class="mt-3 inline-flex items-center gap-2">
+                <button data-interval="24h" class="interval-btn rounded-md px-3 py-2 text-sm bg-white/10 text-white">24h</button>
+                <button data-interval="48h" class="interval-btn rounded-md px-3 py-2 text-sm bg-white/5 text-neutral-300 hover:bg-white/10">48h</button>
+                <button data-interval="72h" class="interval-btn rounded-md px-3 py-2 text-sm bg-white/5 text-neutral-300 hover:bg-white/10">72h</button>
+                <button data-interval="custom" class="interval-btn rounded-md px-3 py-2 text-sm bg-white/5 text-neutral-300 hover:bg-white/10">Custom</button>
+              </div>
+              <div id="custom-interval" class="mt-3 hidden">
+                <div class="flex items-center gap-2">
+                  <input id="custom-hrs" type="number" min="1" value="36" class="w-20 bg-transparent rounded-md border border-white/10 px-2 py-1.5 text-sm focus:outline-none">
+                  <span class="text-sm text-neutral-300">heures</span>
+                </div>
+                <p class="mt-1 text-xs text-neutral-400">Applique à tous les essais.</p>
+              </div>
+            </div>
+
+            <!-- Channel -->
+            <div class="rounded-md border border-white/10 bg-neutral-950/40 p-4">
+              <label class="text-sm text-neutral-300">Canal de relance</label>
+              <div class="mt-3 flex items-center gap-2">
+                <span class="inline-flex items-center gap-2 rounded-md bg-sky-500/10 text-sky-300 px-2.5 py-1.5 text-xs">
+                  <!-- lucide: mail -->
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M4 4h16v16H4z"></path><path d="m22 6-10 7L2 6"></path>
+                  </svg>
+                  Email actif
+                </span>
+                <span class="inline-flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-1.5 text-xs text-neutral-400">
+                  <!-- lucide: phone -->
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72 12.5 12.5 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.5 12.5 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  SMS bientôt
+                </span>
+              </div>
+              <p class="mt-2 text-xs text-neutral-400">SMS/WhatsApp disponibles ultérieurement.</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-2">
+            <div class="text-xs text-neutral-400">Les statuts se mettront à jour automatiquement (échoué, en retry, récupéré, impossible à récupérer).</div>
+            <button class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-500/90 px-3 py-2 text-sm font-medium">
+              <!-- lucide: save -->
+              <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 3H7a2 2 0 0 0-2 2v14l7-3 7 3V5a2 2 0 0 0-2-2z"></path>
+              </svg>
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Email Templates -->
+      <section data-panel="emails" class="panel hidden mt-6 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Editor -->
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold tracking-tight">Modèle d’email</h3>
+              <div class="inline-flex items-center gap-2">
+                <span class="text-xs text-neutral-400">Variables</span>
+                <div class="flex items-center gap-1">
+                  <span class="chip">[Nom]</span>
+                  <span class="chip">[Montant]</span>
+                  <span class="chip">[Formation]</span>
+                  <span class="chip">[Lien de mise à jour]</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3 space-y-3">
+              <div>
+                <label class="text-xs text-neutral-400">Sujet</label>
+                <input id="subject" class="mt-1 w-full rounded-md border border-white/10 bg-neutral-950/40 px-3 py-2 text-sm focus:outline-none" value="Votre paiement pour [Formation] n’a pas pu être traité.">
+              </div>
+              <div>
+                <label class="text-xs text-neutral-400">Message</label>
+                <textarea id="body" rows="8" class="mt-1 w-full rounded-md border border-white/10 bg-neutral-950/40 px-3 py-2 text-sm focus:outline-none">Bonjour [Nom],
+
+Nous n’avons pas pu traiter votre paiement de [Montant] pour [Formation].
+Pas d’inquiétude — vous pouvez mettre à jour votre carte en toute sécurité via le lien ci-dessous :
+
+[Lien de mise à jour]
+
+Merci,</textarea>
+                <p class="mt-1 text-xs text-neutral-400">Envoyé via votre SMTP (Sendgrid / Mailgun / Postmark). Gestion des désinscriptions incluse.</p>
+              </div>
+              <div class="flex items-center justify-between">
+                <button id="send-test" class="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">
+                  <!-- lucide: beaker -->
+                  <svg class="h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M6 2v6l-3 7a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4l-3-7V2"></path><path d="M6 2h12"></path><path d="M14 2v6"></path>
+                  </svg>
+                  M’envoyer un test
+                </button>
+                <button id="save-template" class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-500/90 px-3 py-2 text-sm font-medium">
+                  <!-- lucide: save -->
+                  <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M17 3H7a2 2 0 0 0-2 2v14l7-3 7 3V5a2 2 0 0 0-2-2z"></path>
+                  </svg>
+                  Enregistrer le modèle
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preview + Client page -->
+          <div class="space-y-4">
+            <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-semibold tracking-tight">Aperçu email</h3>
+                <span class="text-xs text-neutral-400">Rendu simplifié</span>
+              </div>
+              <div id="preview" class="mt-3 rounded-md border border-white/10 bg-neutral-950/50 p-4">
+                <div class="text-sm font-medium" id="preview-subject">Votre paiement pour [Formation] n’a pas pu être traité.</div>
+                <div class="mt-2 text-sm text-neutral-300 whitespace-pre-wrap" id="preview-body">Bonjour [Nom],
+
+Nous n’avons pas pu traiter votre paiement de [Montant] pour [Formation].
+Pas d’inquiétude — vous pouvez mettre à jour votre carte en toute sécurité via le lien ci-dessous :
+
+[Lien de mise à jour]
+
+Merci,</div>
+                <div class="mt-3">
+                  <a href="#" class="inline-flex items-center gap-2 rounded-md bg-indigo-500 px-3 py-2 text-xs font-medium hover:bg-indigo-500/90">
+                    <!-- lucide: external-link -->
+                    <svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path>
+                    </svg>
+                    Ouvrir la page de mise à jour
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-semibold tracking-tight">Page client — Mise à jour carte</h3>
+                <span class="text-xs text-neutral-400">Branding infopreneur</span>
+              </div>
+              <div class="mt-3 rounded-md border border-white/10 bg-linear-to-b from-neutral-950 to-neutral-950/60 p-4">
+                <!-- Simulated customer portal entry -->
+                <div class="flex items-center gap-3">
+                  <div class="h-7 w-7 rounded-md bg-indigo-500 grid place-items-center">
+                    <span class="text-xs font-semibold tracking-tight">AB</span>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium">Académie Business</div>
+                    <div class="text-xs text-neutral-400">Identité personnalisée</div>
+                  </div>
+                </div>
+                <div class="mt-3 text-sm text-neutral-300">
+                  Votre paiement pour <span class="font-medium">Formation Copywriting</span> a échoué. Mettez à jour votre carte pour éviter l’interruption d’accès.
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                  <button class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-500/90 px-3 py-2 text-sm font-medium">
+                    <!-- lucide: credit-card -->
+                    <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                    Mettre à jour mon moyen de paiement
+                  </button>
+                  <button class="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">
+                    <!-- lucide: shield-check -->
+                    <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path>
+                    </svg>
+                    Sécurisé via Portal
+                  </button>
+                </div>
+                <div class="mt-2 text-xs text-neutral-500">Après mise à jour, une confirmation vous sera envoyée par email.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notifications -->
+      <section data-panel="notifications" class="panel hidden mt-6 space-y-6">
+        <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4 md:p-5">
+          <h3 class="text-base font-semibold tracking-tight">Notifications</h3>
+          <p class="text-xs text-neutral-400 mt-0.5">Recevez un résumé hebdomadaire du MRR récupéré.</p>
+
+          <div class="mt-4 flex items-center justify-between rounded-md border border-white/10 bg-neutral-950/40 p-4">
+            <div>
+              <div class="text-sm font-medium">Résumé hebdomadaire</div>
+              <div class="text-xs text-neutral-400">Envoi chaque lundi à 9h</div>
+            </div>
+            <!-- Custom toggle -->
+            <button id="weekly-toggle" data-state="on" class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors" style="background: radial-gradient(100% 100% at 0% 0%, rgba(99,102,241,0.6), rgba(79,70,229,0.6));">
+              <span class="sr-only">Activer résumé hebdomadaire</span>
+              <span class="dot translate-x-6 inline-block h-5 w-5 transform rounded-full bg-white transition-transform"></span>
+            </button>
+          </div>
+
+          <div class="mt-4 flex items-center gap-2">
+            <button class="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">
+              <!-- lucide: send -->
+              <svg class="h-4 w-4 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="m22 2-7 20-4-9-9-4 20-7z"></path><path d="M22 2 11 13"></path>
+              </svg>
+              Envoyer un test
+            </button>
+            <span class="text-xs text-neutral-500">Vous pouvez vous désinscrire à tout moment.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Developers -->
+      <section data-panel="dev" class="panel hidden mt-6 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold tracking-tight">Webhooks Stripe</h3>
+              <span class="inline-flex items-center gap-2 rounded-md bg-emerald-500/10 text-emerald-300 px-2.5 py-1.5 text-xs">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Actif
+              </span>
+            </div>
+            <div class="mt-3 space-y-3">
+              <div>
+                <label class="text-xs text-neutral-400">Endpoint</label>
+                <div class="mt-1 flex items-center gap-2">
+                  <input id="endpoint" readonly="" class="flex-1 rounded-md border border-white/10 bg-neutral-950/40 px-3 py-2 text-sm" value="https://api.retrypay.app/webhooks/stripe">
+                  <button data-copy="#endpoint" class="copy inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-xs">
+                    <!-- lucide: copy -->
+                    <svg class="h-3.5 w-3.5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copier
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="text-xs text-neutral-400">Secret</label>
+                <div class="mt-1 flex items-center gap-2">
+                  <input id="secret" type="password" readonly="" class="flex-1 rounded-md border border-white/10 bg-neutral-950/40 px-3 py-2 text-sm" value="whsec_************************">
+                  <button data-copy="#secret" class="copy inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/15 px-3 py-2 text-xs">Copier</button>
+                </div>
+                <p class="mt-1 text-xs text-neutral-500">Chiffrage AES des tokens. Rotation recommandée tous les 90 jours.</p>
+              </div>
+              <div>
+                <label class="text-xs text-neutral-400">Événements</label>
+                <div class="mt-1 flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-neutral-300">invoice.payment_failed</span>
+                  <span class="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-neutral-300">invoice.payment_succeeded</span>
+                  <span class="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-neutral-300">customer.subscription.updated</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-white/10 bg-neutral-900/60 p-4">
+            <h3 class="text-base font-semibold tracking-tight">Stack recommandée</h3>
+            <ul class="mt-3 space-y-2 text-sm text-neutral-300">
+              <li class="flex items-center gap-2">
+                <!-- lucide: boxes -->
+                <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.5 6.5 4 9l5.5 2.5L15 9 9.5 6.5z"></path><path d="M4 9v6l5.5 2.5V11.5"></path><path d="M15 9v6l-5.5 2.5"></path><path d="m9.5 6.5 5.5 2.5v6"></path></svg>
+                Backend: Python + FastAPI ou Node.js + NestJS
+              </li>
+              <li class="flex items-center gap-2">
+                <!-- lucide: database -->
+                <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"></path><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"></path></svg>
+                PostgreSQL
+              </li>
+              <li class="flex items-center gap-2">
+                <!-- lucide: timer -->
+                <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2h4"></path><path d="M12 14l-2-2 2-5"></path><circle cx="12" cy="13" r="9"></circle></svg>
+                Scheduler: Celery / RQ / Bull
+              </li>
+              <li class="flex items-center gap-2">
+                <!-- lucide: globe -->
+                <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20"></path><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                Frontend: React / Next.js
+              </li>
+              <li class="flex items-center gap-2">
+                <!-- lucide: mail -->
+                <svg class="h-4 w-4 text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16v16H4z"></path><path d="m22 6-10 7L2 6"></path></svg>
+                Email: Sendgrid / Mailgun / Postmark
+              </li>
+            </ul>
+            <div class="mt-4 rounded-md border border-white/10 bg-neutral-950/40 p-3 text-xs text-neutral-400">
+              Authentification JWT/OAuth, chiffrement AES des secrets Stripe, consentements clients stockés pour conformité.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer mini -->
+      <footer class="mt-8 border-t border-white/5 pt-6 text-xs text-neutral-500">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>© <span id="year"></span> RetryPay. Tous droits réservés.</div>
+          <div class="flex items-center gap-3">
+            <a class="hover:text-neutral-300" href="#">Sécurité</a>
+            <a class="hover:text-neutral-300" href="#">RGPD</a>
+            <a class="hover:text-neutral-300" href="#">Support</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Utility styles as inline components -->
+    <style>
+      .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .5rem;border-radius:.375rem;background:rgba(255,255,255,.06);color:#d4d4d8;font-size:.75rem}
+    </style>
+
+    <!-- Minimal interactivity -->
+    <script>
+      // Year
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // Tabs
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.panel');
+      function activateTab(name){
+        panels.forEach(p=>p.classList.add('hidden'));
+        document.querySelector(`[data-panel="${name}"]`)?.classList.remove('hidden');
+        tabs.forEach(t=>{
+          const sel = t.getAttribute('data-tab')===name;
+          t.setAttribute('aria-selected', sel ? 'true' : 'false');
+          if(sel){ t.classList.add('bg-white/10','text-white'); t.classList.remove('text-neutral-300');}
+          else { t.classList.remove('bg-white/10','text-white'); t.classList.add('text-neutral-300');}
+        });
+      }
+      tabs.forEach(b=>b.addEventListener('click',()=>activateTab(b.getAttribute('data-tab'))));
+      activateTab('dashboard');
+
+      // Attempts stepper
+      const attempts = document.getElementById('attempts');
+      document.getElementById('attempt-inc').addEventListener('click',()=>{ let v=Number(attempts.value||0); if(v<6) attempts.value=v+1; });
+      document.getElementById('attempt-dec').addEventListener('click',()=>{ let v=Number(attempts.value||0); if(v>1) attempts.value=v-1; });
+
+      // Interval selection
+      const intervalBtns = document.querySelectorAll('.interval-btn');
+      const customBox = document.getElementById('custom-interval');
+      intervalBtns.forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          intervalBtns.forEach(b=>{ b.classList.remove('bg-white/10','text-white'); b.classList.add('bg-white/5','text-neutral-300'); });
+          btn.classList.add('bg-white/10','text-white');
+          customBox.classList.toggle('hidden', btn.dataset.interval!=='custom');
+        });
+      });
+
+      // Email preview binding
+      const subject = document.getElementById('subject');
+      const body = document.getElementById('body');
+      const pSub = document.getElementById('preview-subject');
+      const pBody = document.getElementById('preview-body');
+      subject.addEventListener('input',()=>pSub.textContent = subject.value);
+      body.addEventListener('input',()=>pBody.textContent = body.value);
+
+      // Toggle weekly summary
+      const weekly = document.getElementById('weekly-toggle');
+      weekly.addEventListener('click', ()=>{
+        const on = weekly.getAttribute('data-state')==='on';
+        if(on){
+          weekly.setAttribute('data-state','off');
+          weekly.style.background = 'rgba(255,255,255,0.1)';
+          weekly.querySelector('.dot').style.transform = 'translateX(0)';
+        } else {
+          weekly.setAttribute('data-state','on');
+          weekly.style.background = 'radial-gradient(100% 100% at 0% 0%, rgba(99,102,241,0.6), rgba(79,70,229,0.6))';
+          weekly.querySelector('.dot').style.transform = 'translateX(1.5rem)';
+        }
+      });
+
+      // Copy buttons
+      document.querySelectorAll('.copy').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const sel = btn.getAttribute('data-copy');
+          const el = document.querySelector(sel);
+          try {
+            await navigator.clipboard.writeText(el.value);
+            btn.textContent = 'Copié';
+            setTimeout(()=>btn.textContent='Copier',1200);
+          } catch(e){ console.error(e); }
+        });
+      });
+
+      // Simulate sending test
+      document.getElementById('send-test')?.addEventListener('click', ()=>{
+        alert('Un email test sera envoyé à votre adresse.');
+      });
+
+      // Save template
+      document.getElementById('save-template')?.addEventListener('click', ()=>{
+        alert('Modèle enregistré.');
+      });
+    </script>
+  
+</body></html>

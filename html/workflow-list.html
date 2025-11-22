@@ -1,0 +1,265 @@
+<html lang="fr"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PayRecall — Gestion des Workflows</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Utility for color variants */
+      .bg-emerald-500\/10 { background-color: rgba(16, 185, 129, 0.1); }
+      .ring-emerald-500\/30 { --tw-ring-color: rgba(16, 185, 129, 0.3); }
+      .text-emerald-300 { color: #6ee7b7; }
+      .bg-amber-500\/10 { background-color: rgba(245, 158, 11, 0.1); }
+      .ring-amber-500\/30 { --tw-ring-color: rgba(245, 158, 11, 0.3); }
+    </style>
+  </head>
+  <body class="bg-neutral-950 text-neutral-100 antialiased selection:bg-indigo-500/30 selection:text-white" style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;">
+    <div class="flex flex-col min-h-screen"> 
+      <header class="border-b border-white/5 flex-shrink-0">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between py-4">
+            <div class="flex items-center gap-3">
+              <div class="h-8 w-8 rounded-md bg-gradient-to-tr from-indigo-500 to-violet-500 grid place-items-center text-xs font-semibold tracking-tight">
+                PR
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-base font-medium tracking-tight">PayRecall</span>
+                <span class="text-xs text-neutral-400">Relances automatiques Stripe</span>
+              </div>
+            </div>
+            <div class="hidden">
+              </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="px-4 sm:px-6 lg:px-8 py-6 flex-shrink-0">
+        <div class="flex items-center justify-between">
+          <h1 class="text-3xl sm:text-4xl tracking-tight font-semibold">Tous les Workflows</h1>
+          <a href="workflow.html" id="createWorkflowBtn" class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-400 transition-colors text-white px-3 py-1.5 text-sm font-medium">
+            <i data-lucide="plus" class="h-4 w-4"></i>
+            Créer un nouveau workflow
+          </a>
+        </div>
+        <p class="mt-2 text-neutral-400 text-sm">Gérez et configurez la séquence de relances pour chaque type d'abonnement.</p>
+      </section>
+
+      <section class="px-4 sm:px-6 lg:px-8 flex-grow pb-8">
+        <div>
+          <div class="grid grid-cols-12 gap-4 py-3 text-xs text-neutral-400 font-medium tracking-wide border-b border-white/10 px-4">
+            <div class="col-span-5">NOM DU WORKFLOW</div>
+            <div class="col-span-2 hidden sm:block">STATUT</div>
+            <div class="col-span-1 hidden sm:block">ÉTAPES</div>
+            <div class="col-span-2 hidden sm:block">DÉLAI TOTAL</div>
+            <div class="col-span-2 text-right hidden sm:block">MODIFIÉ LE</div>
+            <div class="col-span-7 sm:hidden">Détails</div>
+          </div>
+
+          <ul id="workflowsList" class="divide-y divide-white/10">
+            </ul>
+
+          <div id="emptyState" class="hidden text-center py-10">
+            <i data-lucide="inbox" class="h-10 w-10 text-neutral-600 mx-auto"></i>
+            <p class="mt-3 text-sm text-neutral-400">Aucun workflow trouvé. Commencez par en créer un !</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="border-t border-white/5 flex-shrink-0">
+        <div class="px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row items-center justify-between py-6 gap-3">
+            <div class="flex items-center gap-3">
+              <div class="h-6 w-6 rounded-md bg-gradient-to-tr from-indigo-500 to-violet-500 grid place-items-center text-[0.65rem] font-semibold tracking-tight">
+                PR
+              </div>
+              <span class="text-xs text-neutral-400">© PayRecall — Recovery sur abonnements Stripe échoués</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <a href="#" class="inline-flex items-center gap-2 text-xs text-neutral-300 hover:text-white">
+                <i data-lucide="book-open" class="h-3.5 w-3.5"></i>
+                Documentation
+              </a>
+              <a href="#" class="inline-flex items-center gap-2 text-xs text-neutral-300 hover:text-white">
+                <i data-lucide="life-buoy" class="h-3.5 w-3.5"></i>
+                Support
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Lucide icons
+      function mountIcons() {
+        if (window.lucide) {
+          lucide.createIcons({ attrs: { width: '1em', height: '1em', strokeWidth: 1.5 } });
+        }
+      }
+
+      // Mock Data
+      const workflows = [
+          {
+              id: 1,
+              name: 'Abonnement Standard - Échec',
+              status: 'Actif',
+              stepsCount: 3,
+              totalDelayHours: 72,
+              lastModified: '20/10/2025',
+          },
+          {
+              id: 2,
+              name: 'Abonnement Premium - Annulation',
+              status: 'Brouillon',
+              stepsCount: 1,
+              totalDelayHours: 24,
+              lastModified: '15/11/2025',
+          },
+          {
+              id: 3,
+              name: 'Offre Découverte - Récupération',
+              status: 'Inactif',
+              stepsCount: 4,
+              totalDelayHours: 120,
+              lastModified: '20/11/2025',
+          },
+          {
+              id: 4,
+              name: 'Workflows Stripe Legacy',
+              status: 'Actif',
+              stepsCount: 2,
+              totalDelayHours: 48,
+              lastModified: '01/09/2025',
+          },
+           {
+              id: 5,
+              name: 'Abonnement Annuel - Récupération Forte',
+              status: 'Actif',
+              stepsCount: 5,
+              totalDelayHours: 168,
+              lastModified: '01/11/2025',
+          },
+          {
+              id: 6,
+              name: 'Ancien Workflows - Archive',
+              status: 'Inactif',
+              stepsCount: 2,
+              totalDelayHours: 48,
+              lastModified: '25/08/2025',
+          },
+          {
+              id: 7,
+              name: 'VIP',
+              status: 'Brouillon',
+              stepsCount: 1,
+              totalDelayHours: 0.5,
+              lastModified: '22/11/2025',
+          }
+      ];
+
+      // Helpers
+      function formatTotalDelay(hours) {
+        if (hours === 0) return 'Immédiat';
+        if (hours < 1) return `${Math.round(hours * 60)} min`;
+        if (hours < 24) return `${Math.round(hours)} h`;
+        const d = Math.floor(hours / 24);
+        const h = Math.round(hours % 24);
+        if (h === 0) return `${d} j`;
+        return `${d} j ${h} h`;
+      }
+
+      function getStatusClasses(status) {
+          switch (status) {
+              case 'Actif':
+                  return {
+                      icon: 'check-circle',
+                      text: 'text-emerald-300',
+                      bg: 'bg-emerald-500/10 ring-emerald-500/30'
+                  };
+              case 'Brouillon':
+                  return {
+                      icon: 'pen-tool',
+                      text: 'text-amber-300',
+                      bg: 'bg-amber-500/10 ring-amber-500/30'
+                  };
+              case 'Inactif':
+              default:
+                  return {
+                      icon: 'slash',
+                      text: 'text-neutral-400',
+                      bg: 'bg-white/5 ring-white/10'
+                  };
+          }
+      }
+
+      // Main Renderer
+      function renderWorkflowsList() {
+          const container = document.getElementById('workflowsList');
+          container.innerHTML = '';
+          
+          if (workflows.length === 0) {
+              document.getElementById('emptyState').classList.remove('hidden');
+              return;
+          }
+
+          workflows.forEach(workflow => {
+              const statusClasses = getStatusClasses(workflow.status);
+              const totalDelayFormatted = formatTotalDelay(workflow.totalDelayHours);
+
+              // Workflow List Item
+              const workflowItem = document.createElement('li');
+              // Using a link inside the li for the entire row to be clickable
+              workflowItem.innerHTML = `
+                  <a href="workflow.html?id=${workflow.id}" class="grid grid-cols-12 gap-4 items-center px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer">
+                      
+                      <div class="col-span-5 flex items-center gap-3">
+                          <span class="text-sm font-medium tracking-tight truncate text-white">${workflow.name}</span>
+                      </div>
+
+                      <div class="col-span-2 hidden sm:block">
+                          <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${statusClasses.bg} ${statusClasses.text}">
+                              <i data-lucide="${statusClasses.icon}" class="h-3 w-3"></i>
+                              ${workflow.status}
+                          </span>
+                      </div>
+                      
+                      <div class="col-span-1 hidden sm:block text-sm text-neutral-300">
+                          ${workflow.stepsCount}
+                      </div>
+                      
+                      <div class="col-span-2 hidden sm:block text-sm text-neutral-300">
+                          ${totalDelayFormatted}
+                      </div>
+                      
+                      <div class="col-span-2 text-right hidden sm:block text-sm text-neutral-400">
+                          ${workflow.lastModified}
+                      </div>
+                      
+                      <div class="col-span-7 sm:hidden text-xs text-neutral-400 flex flex-col gap-1">
+                          <div class="flex items-center gap-3">
+                             <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.7rem] font-medium ${statusClasses.bg} ${statusClasses.text}">
+                                ${workflow.status}
+                            </span>
+                            <span class="text-neutral-300">${workflow.stepsCount} étapes</span>
+                          </div>
+                          <span class="text-neutral-400">Délai: ${totalDelayFormatted}</span>
+                      </div>
+                  </a>
+              `;
+              container.appendChild(workflowItem);
+          });
+          
+          mountIcons();
+      }
+
+      // Initial render
+      document.addEventListener('DOMContentLoaded', () => {
+          renderWorkflowsList();
+          mountIcons();
+      });
+    </script>
+
+</div></body></html>

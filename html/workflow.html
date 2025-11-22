@@ -1,0 +1,654 @@
+<html lang="fr"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PayRecall — Créer un workflow de relance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-neutral-950 text-neutral-100 antialiased selection:bg-indigo-500/30 selection:text-white" style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;">
+    <div class="min-h-screen">
+      <header class="border-b border-white/5">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between py-4">
+            <div class="flex items-center gap-3">
+              <div class="h-8 w-8 rounded-md bg-gradient-to-tr from-indigo-500 to-violet-500 grid place-items-center text-xs font-semibold tracking-tight">
+                PR
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-base font-medium tracking-tight">PayRecall</span>
+                <span class="text-xs text-neutral-400">Relances automatiques Stripe</span>
+              </div>
+            </div>
+            <div class="hidden">
+              <span class="inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1.5 text-xs text-neutral-300">
+                <i data-lucide="shield-check" class="h-3.5 w-3.5"></i>
+                Sécure &amp; RGPD
+              </span>
+              <span class="inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 px-3 py-1.5 text-xs text-neutral-300">
+                <i data-lucide="repeat" class="h-3.5 w-3.5"></i>
+                Recovery automatisé
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button id="backBtn" class="inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors px-3 py-1.5 text-xs text-neutral-300">
+              <i data-lucide="arrow-left" class="h-3.5 w-3.5"></i>
+              Retour
+            </button>
+            <div class="hidden">
+              <a href="#" class="hover:text-white">Dashboard</a>
+              <i data-lucide="chevron-right" class="h-3 w-3"></i>
+              <a href="#" class="hover:text-white">Workflows</a>
+              <i data-lucide="chevron-right" class="h-3 w-3"></i>
+              <span class="text-neutral-300">Créer un workflow</span>
+            </div>
+          </div>
+          <button id="helpBtn" class="hidden inline-flex items-center justify-center rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors h-8 w-8 text-neutral-300" title="Un workflow envoie automatiquement des relances après un échec de paiement. Configurez les étapes, délais, emails et testez avant d’activer.">
+            <i data-lucide="help-circle" class="h-4 w-4"></i>
+          </button>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <h1 class="text-3xl sm:text-4xl tracking-tight font-semibold">Créer un workflow de relance</h1>
+          <div class="flex items-center gap-2">
+            <div class="hidden">
+              <span class="bg-indigo-500 hover:bg-indigo-400"></span>
+              <span class="bg-amber-500 hover:bg-amber-400"></span>
+              <span class="bg-rose-500 hover:bg-rose-400"></span>
+              <span class="bg-emerald-500 hover:bg-emerald-400"></span>
+              <span class="bg-sky-500 hover:bg-sky-400"></span>
+              <span class="ring-indigo-500/30 text-indigo-300 bg-indigo-500/10"></span>
+              <span class="ring-amber-500/30 text-amber-300 bg-amber-500/10"></span>
+              <span class="ring-rose-500/30 text-rose-300 bg-rose-500/10"></span>
+              <span class="border-indigo-500 text-indigo-500"></span>
+              <span class="border-amber-500 text-amber-500"></span>
+              <span class="border-rose-500 text-rose-500"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="grid lg:grid-cols-4 gap-6">
+          <div class="lg:col-span-4">
+            <div class="rounded-xl border border-white/10 bg-white/[0.03]">
+              <div class="flex items-center justify-between border-b border-white/10 px-4 py-2">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="workflow" class="h-4 w-4 text-indigo-300"></i>
+                  <h2 class="text-xl tracking-tight font-semibold">Séquence des relances</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button id="addStepBtn" class="inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-400 transition-colors text-white px-3 py-1.5 text-xs font-medium">
+                    <i data-lucide="plus" class="h-3.5 w-3.5"></i>
+                    Ajouter une relance
+                  </button>
+                </div>
+              </div>
+
+              <nav class="flex overflow-x-auto border-b border-white/10" id="tabsNavigation">
+                </nav>
+
+              <div id="stepsContainer" class="p-4 grid gap-3">
+                </div>
+            </div>
+          </div>
+
+          <aside class="hidden lg:col-span-1">
+            <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="info" class="h-4 w-4 text-emerald-300"></i>
+                <h3 class="text-lg tracking-tight font-semibold">Résumé du workflow</h3>
+              </div>
+              <div class="mt-3 grid gap-3">
+                <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                  <div class="text-xs text-neutral-300">Nombre d’étapes</div>
+                  <div id="summarySteps" class="mt-1 text-xl tracking-tight font-semibold">—</div>
+                </div>
+                <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                  <div class="text-xs text-neutral-300">Délais totaux</div>
+                  <div id="summaryDelay" class="mt-1 text-xl tracking-tight font-semibold">—</div>
+                </div>
+                <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <div class="text-xs text-neutral-300">Statut</div>
+                      <div id="summaryStatusText" class="mt-1 text-sm font-medium tracking-tight">Inactif</div>
+                    </div>
+                    <button id="workflowStatusToggle" class="inline-flex items-center rounded-full px-1 py-1 ring-1 ring-white/10 bg-white/5">
+                      <span class="sr-only">Activer/Désactiver</span>
+                      <span class="toggle-knob inline-flex items-center justify-center h-6 w-6 rounded-full bg-neutral-700 text-neutral-300">
+                        <i data-lucide="power" class="h-3.5 w-3.5"></i>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                <div class="flex items-start gap-2 text-xs text-neutral-400">
+                  <i data-lucide="lightbulb" class="h-3.5 w-3.5 text-amber-300"></i>
+                  <div>
+                    Conseils: 2–3 relances, 0–10 min, +24h, +48–72h. Objet clair, un CTA unique et traçable.
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <button id="testWorkflowBtn" class="hidden w-full inline-flex items-center justify-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors text-xs text-neutral-200 px-3 py-2">
+                  <i data-lucide="send" class="h-3.5 w-3.5"></i>
+                  Tester le workflow (email fictif)
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="hidden text-xs text-neutral-400">
+            État: <span id="publishState" class="text-neutral-300">Brouillon</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="duplicateWorkflowBtn" class="hidden inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors text-xs text-neutral-200 px-3 py-2">
+              <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+              Dupliquer workflow
+            </button>
+            <button id="cancelBtn" class="hidden inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors text-xs text-neutral-200 px-3 py-2">
+              <i data-lucide="x" class="h-3.5 w-3.5"></i>
+              Annuler
+            </button>
+            <button id="saveBtn" class="inline-flex items-center gap-2 rounded-md bg-emerald-500 hover:bg-emerald-400 transition-colors text-white px-4 py-2 text-sm font-medium">
+              <i data-lucide="save" class="h-4 w-4"></i>
+              Enregistrer le workflow
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div id="editorOverlay" class="hidden fixed inset-0 z-50"></div>
+
+
+      <template id="stepContentTemplate">
+        <div class="step-content grid sm:grid-cols-2 gap-4" data-index="">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <input class="step-name text-2xl font-semibold tracking-tight bg-transparent outline-none ring-0 focus:ring-indigo-500/40 px-0 py-0" style="width: calc(100% - 40px);" placeholder="Nom de la relance">
+              <button class="step-delete inline-flex items-center justify-center h-8 w-8 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors" title="Supprimer l’étape">
+                <i data-lucide="trash-2" class="h-4 w-4"></i>
+              </button>
+            </div>
+
+            <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+              <div class="text-xs text-neutral-300">Délai après l'échec initial (ou la relance précédente)</div>
+              <div class="mt-1 flex items-center gap-2">
+                <input type="number" min="0" class="step-delay-value w-20 rounded-md bg-neutral-900 ring-1 ring-white/10 text-sm text-neutral-100 px-2 py-1 outline-none focus:ring-indigo-500/40">
+                <select class="step-delay-unit rounded-md bg-neutral-900 ring-1 ring-white/10 text-xs text-neutral-200 px-2 py-1 outline-none focus:ring-indigo-500/40">
+                  <option value="minutes">minutes</option>
+                  <option value="heures">heures</option>
+                  <option value="jours">jours</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                <label class="text-xs text-neutral-300">Objet de l'email</label>
+                <input type="text" class="editor-subject mt-1 w-full rounded-md bg-neutral-900 ring-1 ring-white/10 text-sm text-neutral-100 px-3 py-2 outline-none focus:ring-indigo-500/40" placeholder="Objet de l’email">
+              </div>
+
+              <div class="mt-3 rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs text-neutral-300">Contenu</label>
+                  <div class="relative hidden">
+                    <button id="insertVarBtn" class="inline-flex items-center gap-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs text-neutral-200 px-2 py-1">
+                      <i data-lucide="braces" class="h-3.5 w-3.5"></i>
+                      Insérer une variable
+                    </button>
+                    <div id="variablesDropdown" class="hidden absolute right-0 mt-2 w-56 rounded-md bg-neutral-900 ring-1 ring-white/10 shadow-lg p-2">
+                      <div class="text-[0.7rem] text-neutral-400 mb-1">Variables dynamiques</div>
+                      <div class="grid gap-1">
+                        <button data-var="{customer_name}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{customer_name} — Nom du client</button>
+                        <button data-var="{subscription_amount}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{subscription_amount} — Montant</button>
+                        <button data-var="{month}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{month} — Mois</button>
+                        <button data-var="{failure_reason}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{failure_reason} — Raison</button>
+                        <button data-var="{update_payment_link}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{update_payment_link} — Lien MAJ</button>
+                        <button data-var="{subscription_name}" class="var-item text-left text-xs w-full rounded-md hover:bg-white/5 px-2 py-1">{subscription_name} — Nom abo</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <textarea rows="10" class="editor-content mt-1 w-full rounded-md bg-neutral-900 ring-1 ring-white/10 text-sm text-neutral-100 px-3 py-2 outline-none focus:ring-indigo-500/40" placeholder="Bonjour {customer_name}, ..."></textarea>
+              </div>
+
+              <div class="mt-3 grid sm:grid-cols-2 gap-3">
+                <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                  <label class="text-xs text-neutral-300">CTA — Texte</label>
+                  <input type="text" class="editor-cta-text mt-1 w-full rounded-md bg-neutral-900 ring-1 ring-white/10 text-sm text-neutral-100 px-3 py-2 outline-none focus:ring-indigo-500/40" placeholder="Mettre à jour le paiement">
+                </div>
+                <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3 hidden">
+                  <label class="text-xs text-neutral-300">CTA — Couleur</label>
+                  <div class="editor-cta-color mt-1 flex items-center gap-2">
+                    <button data-color="indigo" class="h-7 w-7 rounded-md bg-indigo-500 ring-2 ring-white/10"></button>
+                    <button data-color="emerald" class="h-7 w-7 rounded-md bg-emerald-500 ring-2 ring-white/10"></button>
+                    <button data-color="sky" class="h-7 w-7 rounded-md bg-sky-500 ring-2 ring-white/10"></button>
+                    <button data-color="rose" class="h-7 w-7 rounded-md bg-rose-500 ring-2 ring-white/10"></button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                <label class="text-xs text-neutral-300">Lien dynamique</label>
+                <input type="text" class="editor-cta-link mt-1 w-full rounded-md bg-neutral-900 ring-1 ring-white/10 text-sm text-neutral-100 px-3 py-2 outline-none focus:ring-indigo-500/40" value="{update_payment_link}">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="rounded-lg bg-white/5 ring-1 ring-white/10 p-3 sticky top-4">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-xs text-neutral-300">Aperçu en direct</div>
+                <button class="preview-fakes-btn inline-flex items-center gap-2 rounded-md bg-white/5 ring-1 ring-white/10 hover:bg-white/10 transition-colors text-xs text-neutral-200 px-2 py-1">
+                  <i data-lucide="eye" class="h-3.5 w-3.5"></i>
+                  <span class="preview-fakes-text">Prévisualiser</span>
+                </button>
+              </div>
+              <div class="rounded-md bg-neutral-900 ring-1 ring-white/10 p-3">
+                <div class="preview-subject text-sm font-medium tracking-tight">Objet…</div>
+                <div class="mt-2 text-xs text-neutral-300 whitespace-pre-wrap preview-content">Contenu…</div>
+                <div class="mt-3">
+                  <a href="#" class="preview-cta inline-flex items-center gap-2 rounded-md bg-indigo-500 hover:bg-indigo-400 transition-colors text-white px-3 py-2 text-xs font-medium">
+                    <i data-lucide="link" class="h-3.5 w-3.5"></i>
+                    CTA
+                  </a>
+                  <div class="mt-1 text-[0.7rem] text-neutral-400 preview-link"></div>
+                </div>
+              </div>
+
+              <div class="mt-3 rounded-lg bg-white/5 ring-1 ring-white/10 p-3">
+                <div class="flex items-center gap-2 mb-2">
+                  <i data-lucide="braces" class="h-4 w-4 text-violet-300"></i>
+                  <div class="text-sm font-medium tracking-tight">Variables disponibles</div>
+                </div>
+                <div class="grid gap-2">
+                  <div class="flex items-center justify-between rounded-md bg-white/5 ring-1 ring-white/10 px-2 py-1.5">
+                    <span class="text-xs text-neutral-300">{customer_name}</span>
+                    <span class="text-[0.7rem] text-neutral-400">Nom du client</span>
+                  </div>
+                  <div class="flex items-center justify-between rounded-md bg-white/5 ring-1 ring-white/10 px-2 py-1.5">
+                    <span class="text-xs text-neutral-300">{update_payment_link}</span>
+                    <span class="text-[0.7rem] text-neutral-400">Lien de mise à jour</span>
+                  </div>
+                  <div class="text-[0.7rem] text-neutral-400">
+                    ... {subscription_amount}, {month}, {failure_reason}, etc.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <footer class="border-t border-white/5">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row items-center justify-between py-6 gap-3">
+            <div class="flex items-center gap-3">
+              <div class="h-6 w-6 rounded-md bg-gradient-to-tr from-indigo-500 to-violet-500 grid place-items-center text-[0.65rem] font-semibold tracking-tight">
+                PR
+              </div>
+              <span class="text-xs text-neutral-400">© PayRecall — Recovery sur abonnements Stripe échoués</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <a href="#" class="inline-flex items-center gap-2 text-xs text-neutral-300 hover:text-white">
+                <i data-lucide="book-open" class="h-3.5 w-3.5"></i>
+                Documentation
+              </a>
+              <a href="#" class="inline-flex items-center gap-2 text-xs text-neutral-300 hover:text-white">
+                <i data-lucide="life-buoy" class="h-3.5 w-3.5"></i>
+                Support
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // Lucide icons
+      function mountIcons() {
+        if (window.lucide) {
+          lucide.createIcons({ attrs: { width: '1em', height: '1em', strokeWidth: 1.5 } });
+        }
+      }
+
+      // Data
+      let steps = [
+        {
+          name: 'Première relance',
+          delayValue: 24, // Starting with a 24h delay as a common first action
+          delayUnit: 'heures',
+          action: 'email',
+          active: true,
+          subject: 'Votre paiement a échoué 💳',
+          content: 'Bonjour {customer_name},\n\nNous n’avons pas pu débiter {subscription_amount} pour {subscription_name} ce mois-ci.\n\nPour réactiver immédiatement votre abonnement, veuillez mettre à jour vos informations de paiement en cliquant sur le bouton ci-dessous :\n\nMerci,\nÉquipe PayRecall',
+          ctaText: 'Mettre à jour ma carte',
+          ctaColor: 'indigo',
+          ctaLink: '{update_payment_link}'
+        }
+      ];
+
+      let currentTabIndex = 0;
+      let previewWithFakes = false;
+      const fakes = {
+        customer_name: 'Camille Durand',
+        subscription_amount: '€49',
+        month: 'mars',
+        failure_reason: 'fonds insuffisants',
+        update_payment_link: 'https://payrecall.link/update/demo',
+        subscription_name: 'Pro Mensuel'
+      };
+
+      // Helpers
+      function colorForIndex(i, total) {
+        if (i === 0) return { badge: 'bg-indigo-500/10 ring-1 ring-indigo-500/30 text-indigo-300', dot: 'text-indigo-500', tab: 'border-indigo-500 text-indigo-500' };
+        if (i === total - 1) return { badge: 'bg-rose-500/10 ring-1 ring-rose-500/30 text-rose-300', dot: 'text-rose-500', tab: 'border-rose-500 text-rose-500' };
+        return { badge: 'bg-amber-500/10 ring-1 ring-amber-500/30 text-amber-300', dot: 'text-amber-500', tab: 'border-amber-500 text-amber-500' };
+      }
+
+      function hoursFromStep(step) {
+        const v = Number(step.delayValue || 0);
+        if (step.delayUnit === 'jours') return v * 24;
+        if (step.delayUnit === 'heures') return v;
+        if (step.delayUnit === 'minutes') return v / 60;
+        return 0;
+      }
+
+      function formatTotalDelay(hours) {
+        if (hours < 24) return `${Math.round(hours)} h`;
+        const d = Math.floor(hours / 24);
+        const h = Math.round(hours % 24);
+        if (h === 0) return `${d} j`;
+        return `${d} j ${h} h`;
+      }
+
+      function replaceVars(text, useFakes) {
+        if (!text) return '';
+        // Replace newline characters for HTML preview (only if not using fakes, to display \n in preview)
+        let processedText = text;
+        if (useFakes) {
+             processedText = processedText
+                .replaceAll('{customer_name}', fakes.customer_name)
+                .replaceAll('{subscription_amount}', fakes.subscription_amount)
+                .replaceAll('{month}', fakes.month)
+                .replaceAll('{failure_reason}', fakes.failure_reason)
+                .replaceAll('{update_payment_link}', fakes.update_payment_link)
+                .replaceAll('{subscription_name}', fakes.subscription_name);
+        } else {
+            // Only replace variables if we are not using fakes, we keep {var} tokens
+             processedText = processedText
+                .replaceAll('{customer_name}', '{customer_name}')
+                .replaceAll('{subscription_amount}', '{subscription_amount}')
+                .replaceAll('{month}', '{month}')
+                .replaceAll('{failure_reason}', '{failure_reason}')
+                .replaceAll('{update_payment_link}', '{update_payment_link}')
+                .replaceAll('{subscription_name}', '{subscription_name}');
+        }
+        return processedText;
+      }
+
+      function setButtonColor(el, color) {
+        const map = {
+          indigo: ['bg-indigo-500','hover:bg-indigo-400'],
+          emerald: ['bg-emerald-500','hover:bg-emerald-400'],
+          sky: ['bg-sky-500','hover:bg-sky-400'],
+          rose: ['bg-rose-500','hover:bg-rose-400']
+        };
+        Object.values(map).flat().forEach(c => el.classList.remove(c));
+        (map[color] || map.indigo).forEach(c => el.classList.add(c));
+      }
+
+      // Rendering Summary
+      function renderSummary() {
+        const stepsCount = steps.length;
+        const totalHours = steps.reduce((acc, s) => acc + hoursFromStep(s), 0);
+        const stepsEl = document.getElementById('summarySteps');
+        const delayEl = document.getElementById('summaryDelay');
+        if (stepsEl) stepsEl.textContent = String(stepsCount);
+        if (delayEl) delayEl.textContent = formatTotalDelay(totalHours);
+      }
+
+      // Rendering Steps (Tabs)
+      function renderSteps() {
+        const navContainer = document.getElementById('tabsNavigation');
+        const contentContainer = document.getElementById('stepsContainer');
+        navContainer.innerHTML = '';
+        contentContainer.innerHTML = '';
+
+        steps.forEach((step, i) => {
+          const colors = colorForIndex(i, steps.length);
+          const isActive = i === currentTabIndex;
+
+          // 1. Render Tab Button
+          const tabBtn = document.createElement('button');
+          tabBtn.dataset.index = i;
+          tabBtn.className = `tab-button inline-flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+            isActive
+              ? `${colors.tab} border-current` // Active style
+              : 'border-transparent text-neutral-400 hover:text-neutral-200' // Inactive style
+          }`;
+          tabBtn.innerHTML = `
+            <span class="step-badge inline-flex h-5 w-5 items-center justify-center rounded-md text-xs font-medium ${colors.badge}">${i + 1}</span>
+            <span class="tab-name">${step.name || `Relance ${i + 1}`}</span>
+          `;
+          tabBtn.addEventListener('click', () => {
+            currentTabIndex = i;
+            renderSteps();
+          });
+          navContainer.appendChild(tabBtn);
+
+          // 2. Render Tab Content (Editor)
+          if (isActive) {
+            const tmpl = document.getElementById('stepContentTemplate').content.cloneNode(true);
+            const contentCard = tmpl.querySelector('.step-content');
+            contentCard.dataset.index = i;
+
+            // Name Input
+            const nameInput = contentCard.querySelector('.step-name');
+            nameInput.value = step.name;
+            nameInput.addEventListener('input', (e) => {
+              steps[i].name = e.target.value;
+              // Rerender nav for name change
+              renderSteps();
+            });
+
+            // Delay Inputs
+            const delayValue = contentCard.querySelector('.step-delay-value');
+            const delayUnit = contentCard.querySelector('.step-delay-unit');
+            delayValue.value = step.delayValue;
+            delayUnit.value = step.delayUnit;
+            delayValue.addEventListener('input', (e) => {
+              steps[i].delayValue = e.target.valueAsNumber ?? Number(e.target.value);
+              renderSummary();
+            });
+            delayUnit.addEventListener('change', (e) => {
+              steps[i].delayUnit = e.target.value;
+              renderSummary();
+            });
+
+            // Editor Inputs
+            const subjectEl = contentCard.querySelector('.editor-subject');
+            const contentEl = contentCard.querySelector('.editor-content');
+            const ctaTextEl = contentCard.querySelector('.editor-cta-text');
+            const ctaLinkEl = contentCard.querySelector('.editor-cta-link');
+
+            subjectEl.value = step.subject || '';
+            contentEl.value = step.content || '';
+            ctaTextEl.value = step.ctaText || 'Mettre à jour';
+            ctaLinkEl.value = step.ctaLink || '{update_payment_link}';
+
+            // Preview Elements
+            const prevSubject = contentCard.querySelector('.preview-subject');
+            const prevContent = contentCard.querySelector('.preview-content');
+            const prevCta = contentCard.querySelector('.preview-cta');
+            const prevLink = contentCard.querySelector('.preview-link');
+            const previewFakesBtn = contentCard.querySelector('.preview-fakes-btn');
+            const previewFakesText = contentCard.querySelector('.preview-fakes-text');
+
+            function updatePreview() {
+              const currentStep = steps[i];
+              // Update step data on preview
+              currentStep.subject = subjectEl.value;
+              currentStep.content = contentEl.value;
+              currentStep.ctaText = ctaTextEl.value;
+              currentStep.ctaLink = ctaLinkEl.value;
+              
+              prevSubject.textContent = replaceVars(currentStep.subject, previewWithFakes) || 'Objet…';
+              prevContent.textContent = replaceVars(currentStep.content, previewWithFakes) || 'Contenu…';
+              prevCta.textContent = currentStep.ctaText || 'CTA';
+              prevLink.textContent = replaceVars(currentStep.ctaLink, previewWithFakes);
+              setButtonColor(prevCta, currentStep.ctaColor || 'indigo');
+
+              previewFakesText.textContent = previewWithFakes ? 'Valeurs réelles' : 'Prévisualiser';
+              mountIcons();
+            }
+
+            // Add change listeners to editor fields
+            [subjectEl, contentEl, ctaTextEl, ctaLinkEl].forEach(el => el.addEventListener('input', updatePreview));
+
+            // CTA Color
+            const ctaColorWrap = contentCard.querySelector('.editor-cta-color');
+            if (ctaColorWrap) {
+                ctaColorWrap.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-color]');
+                    if (!btn) return;
+                    const color = btn.getAttribute('data-color');
+                    steps[i].ctaColor = color;
+                    updatePreview();
+                });
+            }
+
+            // Preview Fakes Toggle
+            if (previewFakesBtn) {
+              previewFakesBtn.addEventListener('click', () => {
+                previewWithFakes = !previewWithFakes;
+                updatePreview();
+              });
+            }
+
+            // Delete
+            contentCard.querySelector('.step-delete').addEventListener('click', () => {
+              if (steps.length <= 1) {
+                alert('Au moins une étape est requise.');
+                return;
+              }
+              if (confirm('Supprimer cette étape ?')) {
+                steps.splice(i, 1);
+                currentTabIndex = Math.min(i, steps.length - 1); // Adjust index
+                renderSteps();
+                renderSummary();
+              }
+            });
+
+            contentContainer.appendChild(tmpl);
+            updatePreview(); // Initial preview render
+          }
+        });
+
+        // Scroll to the active tab
+        const activeTab = navContainer.querySelector('.tab-button.border-current');
+        if (activeTab) {
+             activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        mountIcons();
+      }
+
+      // Toolbar actions
+      document.getElementById('addStepBtn').addEventListener('click', () => {
+        const idx = steps.length;
+        steps.push({
+          name: `Relance ${idx + 1}`,
+          delayValue: 24,
+          delayUnit: 'heures',
+          action: 'email',
+          active: true,
+          subject: 'Nouvelle relance',
+          content: 'Bonjour {customer_name},\n\nCeci est un exemple de contenu.\n\nMerci,\nÉquipe PayRecall',
+          ctaText: 'Ouvrir le lien',
+          ctaColor: 'indigo',
+          ctaLink: '{update_payment_link}'
+        });
+        currentTabIndex = idx; // Switch to the new tab
+        renderSteps();
+        renderSummary();
+      });
+
+      const testBtn = document.getElementById('testWorkflowBtn');
+      if (testBtn) {
+        testBtn.addEventListener('click', () => {
+          alert('Un email test sera envoyé avec des valeurs fictives à test@exemple.com');
+        });
+      }
+
+      const saveBtn = document.getElementById('saveBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          const state = document.getElementById('publishState');
+          if (state) state.textContent = 'Actif (brouillon enregistré)';
+          alert('Workflow enregistré avec succès.');
+        });
+      }
+
+      const cancelBtn = document.getElementById('cancelBtn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          if (confirm('Annuler les modifications ?')) location.reload();
+        });
+      }
+
+      const dupBtn = document.getElementById('duplicateWorkflowBtn');
+      if (dupBtn) {
+        dupBtn.addEventListener('click', () => {
+          const clone = JSON.parse(JSON.stringify(steps));
+          steps = steps.concat(clone.map((s) => ({ ...s, name: s.name + ' (copie)' })));
+          renderSteps();
+          renderSummary();
+          alert('Workflow dupliqué dans la page (copie ajoutée en bas).');
+        });
+      }
+
+      // Workflow status toggle (hidden UI)
+      const workflowStatusToggle = document.getElementById('workflowStatusToggle');
+      const summaryStatusText = document.getElementById('summaryStatusText');
+      if (workflowStatusToggle && summaryStatusText) {
+        workflowStatusToggle.addEventListener('click', () => {
+          const active = summaryStatusText.textContent.trim() !== 'Actif';
+          summaryStatusText.textContent = active ? 'Actif' : 'Inactif';
+          const knob = workflowStatusToggle.querySelector('.toggle-knob');
+          knob.classList.toggle('bg-emerald-600', active);
+          knob.classList.toggle('bg-neutral-700', !active);
+        });
+      }
+
+      // Back
+      const backBtn = document.getElementById('backBtn');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => history.back());
+      }
+
+      // Initial render
+      document.addEventListener('DOMContentLoaded', () => {
+        renderSteps();
+        renderSummary();
+        mountIcons();
+      });
+    </script>
+
+</body></html>
