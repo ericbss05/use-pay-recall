@@ -12,6 +12,7 @@ CREATE TABLE "accounts" (
     "scope" TEXT,
     "id_token" TEXT,
     "session_state" TEXT,
+    "stripeAccount" TEXT,
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
 );

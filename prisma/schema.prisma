@@ -32,9 +32,10 @@ model Account {
   scope              String?
   id_token           String?  @db.Text
   session_state      String?
-  stripeAccount      String? 
+  stripeAccount      String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  failedPayments    FailedPayment[]
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -69,4 +70,19 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model FailedPayment {
+  id              String   @id @default(cuid())
+  accountId       String   @map("account_id")
+  invoiceId       String?  @map("invoice_id")
+  subscriptionId  String?  @map("subscription_id")
+  email           String?
+  name            String?
+  amountDue       Int?     @map("amount_due")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("failed_payments")
 }
